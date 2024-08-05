@@ -21,26 +21,25 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "3168975015";
+    const serviceWorkerVersion = "2361996496";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 
   <style>
-    /* Fullscreen overlay for the loading animation */
-    #loading-overlay {
+    /* Basic styles for the loading spinner */
+    #loading-spinner {
       position: fixed;
       width: 100%;
       height: 100%;
-      background-color: white;
-      z-index: 9999;
       display: flex;
       justify-content: center;
       align-items: center;
+      background-color: white; /* or your preferred background color */
+      z-index: 9999; /* Ensure it's on top */
     }
 
-    /* Simple spinner animation */
-    #loading-spinner {
+    .spinner {
       border: 8px solid #f3f3f3;
       border-top: 8px solid #3498db;
       border-radius: 50%;
@@ -56,22 +55,22 @@
   </style>
 </head>
 <body>
-  <!-- Loading overlay and spinner -->
-  <div id="loading-overlay">
-    <div id="loading-spinner"></div>
+  <!-- Loading spinner that will be shown while the app is loading -->
+  <div id="loading-spinner">
+    <div class="spinner"></div>
   </div>
 
   <script>
     window.addEventListener('load', function(ev) {
-      // Download main.dart.js
+      // Initialize the Flutter app
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
-            // Hide the loading overlay once the app is ready to run
-            document.getElementById('loading-overlay').style.display = 'none';
+            // Once Flutter is ready, hide the loading spinner
+            document.getElementById('loading-spinner').style.display = 'none';
             appRunner.runApp();
           });
         }
