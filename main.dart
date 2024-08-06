@@ -36,8 +36,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
 class GifGenerator extends StatefulWidget {
   @override
   _GifGeneratorState createState() => _GifGeneratorState();
@@ -45,12 +43,18 @@ class GifGenerator extends StatefulWidget {
 
 class _GifGeneratorState extends State<GifGenerator> {
   final GlobalKey _globalKey = GlobalKey();
-  String _text = "Hello, GitHub!";
   bool _isCapturing = false;
   Uint8List? _gifBytes;
 
-  int _frameCount = 100; // Increased frame count for smoother animation
+  int _frameCount = 100; // Frame count for smoother animation
   Duration _animationDuration = const Duration(milliseconds: 5000); // Total duration of the text animation
+  int _gifDelay = 3; // Delay between frames in the GIF
+
+  // TextEditingControllers for the four input fields
+  final TextEditingController _controller1 = TextEditingController(text: "Hello world");
+  final TextEditingController _controller2 = TextEditingController(text: "I am Ratul Hasan");
+  final TextEditingController _controller3 = TextEditingController(text: "Programmer");
+  final TextEditingController _controller4 = TextEditingController(text: "Problem solver");
 
   Future<List<img.Image>> _captureFrames(dynamic _) async {
     List<img.Image> frames = [];
@@ -59,7 +63,7 @@ class _GifGeneratorState extends State<GifGenerator> {
     for (int i = 0; i < _frameCount; i++) {
       await Future.delayed(Duration(milliseconds: intervalMillis));
       try {
-        RenderRepaintBoundary ? boundary = _globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+        RenderRepaintBoundary? boundary = _globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
         if (boundary == null) {
           print('Boundary is null');
           continue;
@@ -79,7 +83,8 @@ class _GifGeneratorState extends State<GifGenerator> {
           continue;
         }
 
-        img.Image resizedFrame = img.copyResize(frame, width: 360, height: 260);
+        // Resize frame to its original size (no constraint)
+        img.Image resizedFrame = img.copyResize(frame, width: frame.width, height: frame.height);
         frames.add(resizedFrame);
       } catch (e) {
         print('Error capturing frame: $e');
@@ -90,13 +95,13 @@ class _GifGeneratorState extends State<GifGenerator> {
 
 
   Future<Uint8List?> _generateGif(List<img.Image> frames) async {
-    final gifEncoder = img.GifEncoder(repeat: 0, delay: 3); // Reduced delay to speed up the GIF
+    // Use user-defined delay
+    final gifEncoder = img.GifEncoder(repeat: 0, delay: _gifDelay);
     for (var frame in frames) {
       gifEncoder.addFrame(frame);
     }
     return Uint8List.fromList(gifEncoder.finish()!);
   }
-
 
   void _startCapture() async {
     setState(() {
@@ -109,7 +114,6 @@ class _GifGeneratorState extends State<GifGenerator> {
       _isCapturing = false;
     });
   }
-
 
   void _downloadGif(Uint8List gifBytes) {
     // Convert the Uint8List to a Blob
@@ -125,113 +129,211 @@ class _GifGeneratorState extends State<GifGenerator> {
     html.Url.revokeObjectUrl(url);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: Container(
-        padding: EdgeInsets.all(30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            RepaintBoundary(
-              key: _globalKey,
-              child: Container(
-                width: 360,
-                height: 260,
-                child: Center(
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      TypewriterAnimatedText(
-                        _text,
-                        textStyle: const TextStyle(
-                          fontSize: 32.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                        speed: const Duration(milliseconds: 100),
-                      ),
-                    ],
-                    repeatForever: true,
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+
+              RepaintBoundary(
+                key: _globalKey,
+                child: Container(
+                  color: Colors.transparent,
+                  child: Center(
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        for (final txt in [_controller1.text, _controller2.text, _controller3.text, _controller4.text])
+                          TypewriterAnimatedText(
+                            txt,
+                            textStyle: const TextStyle(
+                              fontSize: 32.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                            speed: const Duration(milliseconds: 100),
+                          ),
+                      ],
+                      repeatForever: true,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(
-                        color: Colors.black87,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide(
-                        color: Colors.green,
-                      ),
-                    ),
-                    hintText: "Input some text here",
+              SizedBox(height: 20,),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      _text = value;
-                    });
-                  },
+                  padding: EdgeInsets.all(20),
                 ),
+                onPressed: _isCapturing ? null : _startCapture,
+                child: Text('Start Capture'),
               ),
-            ),
+              SizedBox(height: 20),
 
-
-            SizedBox(height: 20,),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.all(20),
-              ),
-              onPressed: _isCapturing ? null : _startCapture,
-              child: Text('Start Capture'),
-            ),
-
-            SizedBox(height: 30,),
-
-            if (_isCapturing)
-              CircularProgressIndicator(color: Colors.red,),
-            if (_gifBytes != null && !_isCapturing)
-              Column(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.memory(_gifBytes!),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    child: Column(
+                      children: [
+                        // Four TextFormFields for user input :)
+                        ...[
+                          _controller1,
+                          _controller2,
+                          _controller3,
+                          _controller4
+                        ].map((controller) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide(
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide(
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                hintText: "Your text",
+                              ),
+                              controller: controller,
+                              onChanged: (value) => setState(() {}),
+                            ),
+                          ),
+                        )),
+                        SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
 
-                  SizedBox(height: 10),
+                  SizedBox(width: 20,),
 
                   Container(
-                    width: 260,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.all(20),
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    margin: EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
                       ),
-                      onPressed: () => _downloadGif(_gifBytes!),
-                      child: Text('Download GIF'),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.settings, color: Colors.black87.withOpacity(0.6),),
+                              Text("Settings", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.grey, fontStyle: FontStyle.italic),),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 20,),
+
+                        Text('Animation Duration: ${_animationDuration.inSeconds} seconds'),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: Slider(
+                            value: _animationDuration.inSeconds.toDouble(),
+                            min: 1,
+                            max: 10,
+                            divisions: 9,
+                            label: '${_animationDuration.inSeconds} seconds',
+                            onChanged: (value) {
+                              setState(() {
+                                _animationDuration = Duration(seconds: value.toInt());
+                              });
+                            },
+                          ),
+                        ),
+
+                        Text('Frame Count: $_frameCount'),
+
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: Slider(
+                            value: _frameCount.toDouble(),
+                            min: 20,
+                            max: 200,
+                            divisions: 18,
+                            label: '$_frameCount frames',
+                            onChanged: (value) {
+                              setState(() {
+                                _frameCount = value.toInt();
+                              });
+                            },
+                          ),
+                        ),
+
+                        Text('GIF Delay (ms): $_gifDelay'),
+
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          child: Slider(
+                            value: _gifDelay.toDouble(),
+                            min: 1,
+                            max: 10,
+                            divisions: 9,
+                            label: '$_gifDelay ms',
+                            onChanged: (value) {
+                              setState(() {
+                                _gifDelay = value.toInt();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+
                 ],
               ),
-          ],
+
+
+              SizedBox(height: 30,),
+              if (_isCapturing)
+                CircularProgressIndicator(color: Colors.red,),
+              if (_gifBytes != null && !_isCapturing)
+                Column(
+                  children: [
+                    Image.memory(_gifBytes!),
+                    SizedBox(height: 10),
+                    Container(
+                      width: 260,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.all(20),
+                        ),
+                        onPressed: () => _downloadGif(_gifBytes!),
+                        child: Text('Download GIF'),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     );

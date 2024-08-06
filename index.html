@@ -2,7 +2,6 @@
 <html>
 <head>
   <base href="/readme_gif_generator/">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="gif generator for github">
@@ -19,22 +18,28 @@
   <title>readme_gif_generator</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- Add your CSS here -->
   <style>
-    /* Basic styles for the loading animation */
-    .loader {
+    /* Style for the loading animation */
+    .loading-wrapper {
       position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 80px;
-      height: 80px;
-      border: 8px solid rgba(0, 0, 0, 0.1);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999; /* Ensure it’s above other content */
+    }
+    .spinner {
+      border: 8px solid rgba(0, 0, 0, 0.1); /* Light gray background */
+      border-left: 8px solid #000000; /* Blue spinner */
       border-radius: 50%;
-      border-top: 8px solid #000000;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
     }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -43,14 +48,15 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "1179392316";
+    const serviceWorkerVersion = "1812694195";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
-  <!-- Loading spinner -->
-  <div class="loader" id="loadingSpinner"></div>
+  <div id="loading" class="loading-wrapper">
+    <div class="spinner"></div>
+  </div>
 
   <script>
     window.addEventListener('load', function(ev) {
@@ -62,9 +68,8 @@
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
             appRunner.runApp();
-
-            // Hide the loading spinner when the app is ready
-            document.getElementById('loadingSpinner').style.display = 'none';
+            // Hide the loading screen once the app is initialized
+            document.getElementById('loading').style.display = 'none';
           });
         }
       });
