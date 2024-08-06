@@ -27,6 +27,6 @@ https://onnesok.github.io/readme_gif_generator
 ```
 
 ## Example
-![copy](https://github.com/Onnesok/readme_gif_generator/blob/main/animated_text.gif)
+![copy](https://github.com/Onnesok/readme_gif_generator/blob/main/animated_text%20.gif)
 
 ## [Note]: Use a laptop or computer for generating gif
