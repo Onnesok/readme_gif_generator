@@ -20,57 +20,46 @@
   <link rel="manifest" href="manifest.json">
 
   <script>
-    // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "2361996496";
+    const serviceWorkerVersion = "2355255581";
   </script>
-  <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 
   <style>
-    /* Basic styles for the loading spinner */
-    #loading-spinner {
+    /* Simple CSS for loading animation */
+    #loading {
       position: fixed;
       width: 100%;
       height: 100%;
+      background: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: white; /* or your preferred background color */
-      z-index: 9999; /* Ensure it's on top */
+      z-index: 9999;
     }
 
-    .spinner {
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #3498db;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    #loading img {
+      width: 100px;
+      height: 100px;
     }
   </style>
 </head>
 <body>
-  <!-- Loading spinner that will be shown while the app is loading -->
-  <div id="loading-spinner">
-    <div class="spinner"></div>
+  <!-- Loading Animation -->
+  <div id="loading">
+    <img src="loading.gif" alt="Loading...">
   </div>
 
   <script>
     window.addEventListener('load', function(ev) {
-      // Initialize the Flutter app
+      // Download main.dart.js
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
-            // Once Flutter is ready, hide the loading spinner
-            document.getElementById('loading-spinner').style.display = 'none';
+            // Hide loading animation once the app is ready
+            document.getElementById('loading').style.display = 'none';
             appRunner.runApp();
           });
         }
